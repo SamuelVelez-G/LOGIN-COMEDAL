@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Error {{ codigo }}{% endblock %}
+
+{% block contenido %}
+<div class="error-pagina">
+    <div class="codigo">{{ codigo }}</div>
+    <h1>No fue posible completar la solicitud</h1>
+    <p>{{ mensaje }}</p>
+    <p><a href="{{ url_for('login') }}">Volver al inicio de sesión</a></p>
+</div>
+{% endblock %}

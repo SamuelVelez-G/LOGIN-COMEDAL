@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block titulo %}Mis productos{% endblock %}
+
+{% block contenido %}
+<header class="barra">
+    <div class="contenedor barra__interior">
+        <div class="barra__marca">Portal de asociados</div>
+        <a class="barra__salir" href="{{ url_for('logout') }}">Cerrar sesión</a>
+    </div>
+</header>
+
+<main class="contenedor">
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for categoria, texto in mensajes %}
+            <div class="mensaje mensaje--{{ categoria }}" role="status">{{ texto }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="saludo">
+        <h1>{{ asociado['nombre'] }}</h1>
+        <p>
+            Documento {{ cedula_enmascarada }} &nbsp;·&nbsp; {{ correo_enmascarado }}
+            {% if asociado['ultimo_acceso'] %}
+                &nbsp;·&nbsp; Último ingreso: {{ asociado['ultimo_acceso'] }}
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="resumen">
+        <div class="resumen__dato">
+            <p class="resumen__etiqueta">Total en ahorros</p>
+            <div class="resumen__valor">{{ resumen['total_ahorros'] | pesos }}</div>
+        </div>
+        <div class="resumen__dato">
+            <p class="resumen__etiqueta">Saldo de sus créditos</p>
+            <div class="resumen__valor resumen__valor--deuda">{{ resumen['total_deuda'] | pesos }}</div>
+        </div>
+        <div class="resumen__dato">
+            <p class="resumen__etiqueta">Posición neta</p>
+            <div class="resumen__valor {{ 'resumen__valor--positivo' if posicion_neta >= 0 else 'resumen__valor--deuda' }}">
+                {{ posicion_neta | pesos }}
+            </div>
+        </div>
+    </div>
+
+    <section class="seccion">
+        <h2>Productos</h2>
+        <div class="tarjeta tabla-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Número</th>
+                        <th>Estado</th>
+                        <th style="text-align:right">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for p in productos %}
+                    <tr>
+                        <td>{{ 'Ahorro' if p['tipo'] == 'AHORRO' else 'Crédito' }}</td>
+                        <td class="mono">{{ p['numero'] }}</td>
+                        <td>
+                            <span class="etiqueta etiqueta--{{ 'mora' if p['estado'] == 'MORA' else 'vigente' }}">
+                                {{ 'En mora' if p['estado'] == 'MORA' else 'Al día' }}
+                            </span>
+                        </td>
+                        <td class="num">{{ p['saldo'] | pesos }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">No tiene productos registrados.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <h2>Actividad reciente de su cuenta</h2>
+        <div class="tarjeta tabla-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Evento</th>
+                        <th>Origen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for e in eventos %}
+                    <tr>
+                        <td class="mono">{{ e['fecha_evento'] }}</td>
+                        <td>
+                            {% if e['evento'] == 'LOGIN_EXITOSO' %}Ingreso exitoso
+                            {% elif e['evento'] == 'LOGIN_FALLIDO' %}Intento fallido
+                            {% elif e['evento'] == 'CUENTA_BLOQUEADA' %}Cuenta bloqueada
+                            {% elif e['evento'] == 'LOGOUT' %}Cierre de sesión
+                            {% else %}{{ e['evento'] }}{% endif %}
+                        </td>
+                        <td class="mono">{{ e['ip_origen'] or '—' }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Sin actividad registrada.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p class="nota-privacidad">
+            Se registra todo intento de acceso a su cuenta para que usted pueda
+            detectar actividad que no reconozca. Nunca se almacena su contraseña:
+            el sistema guarda únicamente una huella criptográfica irreversible.
+        </p>
+    </section>
+
+</main>
+{% endblock %}

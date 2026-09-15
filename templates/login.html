@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Ingreso de asociados{% endblock %}
+
+{% block contenido %}
+<div class="acceso">
+
+    <section class="acceso__marca">
+        <div class="marca__nombre">
+            Cooperativa
+            <span>PORTAL DE ASOCIADOS</span>
+        </div>
+
+        <h2 class="marca__titular">Consulte sus productos de ahorro y crédito</h2>
+
+        <p class="marca__nota">
+            El acceso a este portal queda registrado. Sus datos se tratan conforme
+            a la Ley 1581 de 2012 de protección de datos personales.
+        </p>
+    </section>
+
+    <section class="acceso__formulario">
+        <div class="formulario__caja">
+            <h1>Iniciar sesión</h1>
+            <p class="formulario__intro">Ingrese con su usuario o su correo registrado.</p>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, texto in mensajes %}
+                    <div class="mensaje mensaje--{{ categoria }}" role="alert">{{ texto }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="campo">
+                    <label for="identificador">Usuario o correo</label>
+                    <input type="text" id="identificador" name="identificador"
+                           value="{{ identificador }}" autocomplete="username"
+                           required autofocus>
+                </div>
+
+                <div class="campo">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password"
+                           autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="boton">Ingresar</button>
+            </form>
+
+            <div class="credenciales">
+                <p>Credenciales para evaluación de la prueba técnica:</p>
+                <p><code>arestrepo / Comedal2026*</code></p>
+                <p><code>cgomez / Medellin2026*</code></p>
+                <p><code>lospina / Antioquia2026*</code></p>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
